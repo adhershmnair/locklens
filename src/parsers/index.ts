@@ -7,7 +7,7 @@ import { parsePnpmLock } from './pnpm';
 import { parseBunLock } from './bun';
 import { parseComposerLock } from './composer';
 
-export type ManifestKind = 'node' | 'composer';
+type ManifestKind = 'node' | 'composer';
 
 export function detectManifest(filePath: string): ManifestKind | null {
   const base = path.basename(filePath);

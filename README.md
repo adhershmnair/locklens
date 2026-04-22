@@ -14,18 +14,19 @@ Inline resolved versions from lock files — one extension, five ecosystems.
 
 ## What it does
 
-LockLens peeks into your lock files and shows the **actually resolved version** of every declared dependency, right next to the semver range in your manifest:
+LockLens reads your lock file and shows the **actually resolved version** of every declared dependency inline, color-coded by whether a newer version is available on the registry.
 
 ```jsonc
 {
   "dependencies": {
-    "react": "^18.2.0",        → 18.3.1  (pnpm)
-    "lodash": "^4.0.0"         → 4.17.21 (pnpm)
+    "react": "^18.2.0",        → 18.3.1    (green — up to date)
+    "postcss": "^8.5.10",      → 8.5.10    (green — up to date)
+    "mysql2": "^3.22.0"        → 3.22.0    (red — 3.22.2 on npm)
   }
 }
 ```
 
-No more running `npm ls`, `pnpm why`, or `composer show` just to see what got installed.
+Hover over any entry to see the latest registry version, the update drift (`major` / `minor` / `patch`), transitive versions pulled by other packages, and a deep link to the registry page.
 
 ## Supported files
 
@@ -34,48 +35,51 @@ No more running `npm ls`, `pnpm why`, or `composer show` just to see what got in
 | `package.json` | `pnpm-lock.yaml`, `yarn.lock` (classic + Berry), `bun.lock`, `package-lock.json`, `npm-shrinkwrap.json` |
 | `composer.json` | `composer.lock` |
 
-LockLens picks the first lock file it finds in that priority order (pnpm → yarn → bun → npm), so monorepos with multiple lock files still resolve predictably.
+Detection priority for Node projects: `pnpm → yarn → bun → npm`.
 
 ## Features
 
-- **Zero runtime dependencies** — all lock-file parsing is built in.
-- **Inline decorations** — resolved versions render as subtle ghost text next to each entry.
-- **Hover tooltips** — shows which lock file the version came from.
-- **Auto-refresh** — re-reads when you save a lock file.
-- **Toggle on/off** — `LockLens: Toggle inline versions` from the command palette.
-- Sections scanned:
-  - `dependencies`, `devDependencies`, `peerDependencies`, `optionalDependencies` in `package.json`
-  - `require`, `require-dev` in `composer.json`
+- **Resolved versions inline** — picks the highest version from the lockfile when a package has multiple installs.
+- **Registry update check** — queries [npmjs.com](https://www.npmjs.com) / [Packagist](https://packagist.org) and color-codes the inline text:
+  - 🔴 **Red** — a newer version is available.
+  - 🟢 **Green** — the installed version matches the registry latest.
+- **Transitive version hover** — if a dependency exists at multiple versions in the lockfile, the hover lists each one and which parent package pulled it (supported for npm, yarn, pnpm).
+- **Registry links** — each hover has a deep link pinned to the exact installed version.
+- **Manual refresh** — the `LockLens: Refresh resolved versions` command clears the cache and re-fetches.
+- **Zero runtime dependencies** — every parser is written from scratch.
 
 ## Settings
 
 | Key | Default | Purpose |
 |---|---|---|
-| `locklens.enabled` | `true` | Show inline resolved versions. |
-| `locklens.showOnlyIfDiffers` | `false` | Hide the annotation when the resolved version already matches the declared string. |
-| `locklens.decorationColor` | `#7c7c7c` | Color of the inline text. |
+| `locklens.enabled` | `true` | Show inline versions. |
+| `locklens.checkUpdates` | `true` | Query the registry for the latest version. |
+| `locklens.colorize` | `true` | Red/green coloring. Turn off for a single neutral color. |
+| `locklens.outdatedColor` | `#d64545` | Color when a newer version is available. |
+| `locklens.upToDateColor` | `#64a46b` | Color otherwise. |
 
 ## Commands
 
-- `LockLens: Refresh resolved versions`
-- `LockLens: Toggle inline versions`
+- `LockLens: Refresh resolved versions` — clears the registry cache and re-renders every open manifest.
+- `LockLens: Toggle inline versions` — hides/shows annotations for the current session.
 
 ## How it works
 
 On opening a `package.json` or `composer.json`, LockLens:
 
 1. Detects the manifest kind.
-2. Looks for a sibling lock file.
-3. Parses it into a `name → version` map.
-4. Finds each declared dependency in the manifest and attaches an after-line decoration with the resolved version.
+2. Looks for a sibling lock file in the same directory.
+3. Parses it into a map of `name → [versions]` (with parent info where available).
+4. Picks the highest version per package and renders it inline.
+5. Asynchronously queries the registry for the latest published version; caches it for one hour; updates the decoration color once the response arrives.
 
-All parsing is done with hand-written, dependency-free parsers — the extension ships with **no `node_modules` at runtime**.
+All parsing is hand-written and dependency-free.
 
 ## Caveats
 
-- Bun's binary `bun.lockb` is not read — generate the text format with `bun install --save-text-lockfile` (or use Bun 1.2+ defaults).
-- Only direct dependencies shown in the manifest are annotated. Transitive versions are not surfaced inline.
-- Workspaces/monorepos: the lock file must live in the same directory as the manifest, or alongside the root workspace manifest.
+- Bun's binary `bun.lockb` is not read — generate the text format with Bun 1.2+ (`bun install` writes `bun.lock` by default).
+- Registry checks require outbound HTTPS. If you're behind a proxy and annotations stay un-colored, LockLens currently doesn't forward proxy config.
+- Workspaces/monorepos: the lock file must live in the same directory as the manifest (or in the root workspace).
 
 ## License
 

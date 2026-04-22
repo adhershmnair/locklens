@@ -1,45 +1,41 @@
 # Changelog
 
-All notable changes to **LockLens** are documented in this file.
-
 ## [0.2.0] — 2026-04-22
 
 ### Added
 
-- **Outdated-version detection.** LockLens now queries the registry for the latest published version and color-codes each dependency:
-  - 🔴 **Red** — a newer version is available on the registry.
-  - 🟢 **Green** — the resolved version matches the latest on the registry.
-  - ⚪ **Gray** — the latest version is being fetched, the registry is unreachable, or update checks are disabled.
-- When a dependency is outdated, the inline annotation shows both the resolved and the latest version (e.g. `→ 18.2.0 ⟶ 19.2.5`).
-- Hover card now reports the update status and classifies the drift as `major`, `minor`, or `patch`.
-- In-memory cache with a 1-hour TTL so the registry is never hammered.
-- Graceful fallback to the "unknown" state when the registry is unreachable or a package isn't found.
+- Registry update checks: queries [npmjs.com](https://www.npmjs.com) for Node manifests and [Packagist](https://packagist.org) for Composer manifests.
+- Inline color coding: **red** when a newer version is available, **green** otherwise.
+- Multi-version tracking: when a package has multiple resolved versions in the lockfile, the highest one is shown inline and the rest are listed in the hover with their parent packages.
+- Parent attribution for transitive dependencies across npm, yarn (classic + Berry), and pnpm.
+- Clickable registry links in the hover, pinned to the installed version.
+- One-hour in-memory cache for registry responses. `LockLens: Refresh resolved versions` clears the cache and re-fetches.
 
-### Settings
+### Changed
 
-- `locklens.checkUpdates` — enable or disable registry lookups (default: `true`).
-- `locklens.colorize` — toggle red/green coloring; when off, a single neutral color is used (default: `true`).
-- `locklens.outdatedColor` — color when a newer version is available on the registry (default: `#d64545`).
-- `locklens.upToDateColor` — color otherwise (default: `#64a46b`).
+- Simplified settings surface.
+- Hover no longer mentions the lockfile type redundantly.
+- HTTPS fetch hardened: https-only, redirect cap, response-size cap, stream error handler.
 
 ### Removed
 
-- `locklens.showOnlyIfDiffers` setting (always show the resolved version now).
-- `locklens.decorationColor` setting (simplified to two states).
+- `locklens.showOnlyIfDiffers` — the resolved version is always shown now.
+- `locklens.decorationColor` — superseded by the two status colors.
+
+### Settings
+
+- `locklens.enabled`
+- `locklens.checkUpdates`
+- `locklens.colorize`
+- `locklens.outdatedColor`
+- `locklens.upToDateColor`
 
 ## [0.1.0] — 2026-04-22
 
 ### Added
 
-- Inline resolved-version annotations for `package.json`, sourced from:
-  - `pnpm-lock.yaml`
-  - `yarn.lock` (classic and Berry)
-  - `bun.lock` (Bun ≥ 1.2, text format)
-  - `package-lock.json` (lockfile v1, v2, v3)
-  - `npm-shrinkwrap.json`
-- Inline resolved-version annotations for `composer.json`, sourced from `composer.lock`.
-- Rich hover card per dependency, linking to [npmjs.com](https://www.npmjs.com) or [Packagist](https://packagist.org).
+- Inline resolved-version annotations for `package.json` (npm, yarn classic + Berry, pnpm, bun) and `composer.json`.
+- Rich hover card with a deep link to the registry.
 - Commands: `LockLens: Refresh resolved versions`, `LockLens: Toggle inline versions`.
-- Configuration: `locklens.enabled`, `locklens.showOnlyIfDiffers`, `locklens.decorationColor`.
-- Automatic refresh on lock-file save.
-- Zero runtime dependencies — all lock-file parsing is implemented in-tree.
+- Auto-refresh on lock-file save.
+- Zero runtime dependencies.

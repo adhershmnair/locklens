@@ -1,11 +1,11 @@
-export interface ParsedVersion {
+interface ParsedVersion {
   major: number;
   minor: number;
   patch: number;
   pre: string | null;
 }
 
-export function parseVersion(v: string): ParsedVersion | null {
+function parseVersion(v: string): ParsedVersion | null {
   const m = /^v?(\d+)\.(\d+)\.(\d+)(?:-([^+]+))?(?:\+.+)?$/.exec(v.trim());
   if (!m) return null;
   return {

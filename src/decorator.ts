@@ -10,6 +10,10 @@ type Status = 'outdated' | 'current';
 
 const NEUTRAL_COLOR = '#7c7c7c';
 
+function encodePackagePath(name: string): string {
+  return name.split('/').map(encodeURIComponent).join('/');
+}
+
 export class LockLensDecorator {
   private deco: Record<Status, vscode.TextEditorDecorationType>;
   private enabled = true;
@@ -116,14 +120,15 @@ export class LockLensDecorator {
   ): vscode.MarkdownString {
     const registryName = source === 'composer' ? 'Packagist' : 'npm';
     const primary = sorted[0].version;
+    const encodedName = encodePackagePath(name);
     const url = source === 'composer'
-      ? `https://packagist.org/packages/${name}#${encodeURIComponent(primary)}`
-      : `https://www.npmjs.com/package/${name}/v/${encodeURIComponent(primary)}`;
+      ? `https://packagist.org/packages/${encodedName}#${encodeURIComponent(primary)}`
+      : `https://www.npmjs.com/package/${encodedName}/v/${encodeURIComponent(primary)}`;
 
     const lines: string[] = [];
     lines.push(`**${name}**`);
     lines.push('');
-    lines.push(`**Installed:** \`${primary}\` _(from \`${source}\` lockfile)_`);
+    lines.push(`**Installed:** \`${primary}\``);
 
     if (sorted.length > 1) {
       lines.push('');
