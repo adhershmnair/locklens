@@ -6,9 +6,9 @@ import { getCachedLatest, getLatestVersion } from './registry';
 import { classifyDrift, compareVersions } from './semver';
 
 type Source = 'npm' | 'yarn' | 'pnpm' | 'bun' | 'composer';
-type Status = 'outdated' | 'upToDate' | 'unknown';
+type Status = 'outdated' | 'current';
 
-const UNKNOWN_COLOR = '#7c7c7c';
+const NEUTRAL_COLOR = '#7c7c7c';
 
 export class LockLensDecorator {
   private deco: Record<Status, vscode.TextEditorDecorationType>;
@@ -47,14 +47,12 @@ export class LockLensDecorator {
     const resolution = resolveForManifest(editor.document.fileName);
     if (!resolution) { this.clear(editor); return; }
 
-    const onlyIfDiffers = this.cfg<boolean>('showOnlyIfDiffers', false);
     const checkUpdates = this.cfg<boolean>('checkUpdates', true);
     const deps = findDependencies(editor.document, kind);
 
     const buckets: Record<Status, vscode.DecorationOptions[]> = {
       outdated: [],
-      upToDate: [],
-      unknown: []
+      current: []
     };
 
     for (const dep of deps) {
@@ -64,18 +62,16 @@ export class LockLensDecorator {
       const sorted = [...entries].sort((a, b) => compareVersions(b.version, a.version));
       const primary = sorted[0].version;
 
-      if (onlyIfDiffers && rangesMatch(dep.declaredRange, primary)) continue;
-
       const registryKind = kind === 'composer' ? 'composer' : 'node';
-      let status: Status = 'unknown';
       let latest: string | null | undefined = undefined;
+      let status: Status = 'current';
 
       if (checkUpdates) {
         latest = getCachedLatest(registryKind, dep.name);
         if (latest === undefined) {
           this.scheduleFetch(editor, registryKind, dep.name);
-        } else if (latest !== null) {
-          status = compareVersions(primary, latest) < 0 ? 'outdated' : 'upToDate';
+        } else if (latest && compareVersions(primary, latest) < 0) {
+          status = 'outdated';
         }
       }
 
@@ -142,12 +138,12 @@ export class LockLensDecorator {
     if (status === 'outdated' && latest) {
       const drift = classifyDrift(primary, latest);
       lines.push(`**Latest on ${registryName}:** \`${latest}\` — 🔴 ${drift} update available`);
-    } else if (status === 'upToDate' && latest) {
+    } else if (latest) {
       lines.push(`**Latest on ${registryName}:** \`${latest}\` — 🟢 up to date`);
     } else if (latest === null) {
-      lines.push(`**Latest on ${registryName}:** ⚪ couldn't reach the registry`);
+      lines.push(`**Latest on ${registryName}:** couldn't reach the registry`);
     } else {
-      lines.push(`**Latest on ${registryName}:** ⚪ checking…`);
+      lines.push(`**Latest on ${registryName}:** checking…`);
     }
 
     lines.push('');
@@ -157,22 +153,17 @@ export class LockLensDecorator {
   }
 
   private buildDecorations(): Record<Status, vscode.TextEditorDecorationType> {
-    const outdated = this.cfg<string>('outdatedColor', '#d64545');
-    const upToDate = this.cfg<string>('upToDateColor', '#64a46b');
+    const colorize = this.cfg<boolean>('colorize', true);
+    const outdatedColor = colorize ? this.cfg<string>('outdatedColor', '#d64545') : NEUTRAL_COLOR;
+    const currentColor = colorize ? this.cfg<string>('upToDateColor', '#64a46b') : NEUTRAL_COLOR;
     const margin = '0 0 0 1.5rem';
     return {
-      outdated: vscode.window.createTextEditorDecorationType({ after: { margin, color: outdated } }),
-      upToDate: vscode.window.createTextEditorDecorationType({ after: { margin, color: upToDate } }),
-      unknown: vscode.window.createTextEditorDecorationType({ after: { margin, color: UNKNOWN_COLOR } })
+      outdated: vscode.window.createTextEditorDecorationType({ after: { margin, color: outdatedColor } }),
+      current: vscode.window.createTextEditorDecorationType({ after: { margin, color: currentColor } })
     };
   }
 
   private cfg<T>(key: string, fallback: T): T {
     return vscode.workspace.getConfiguration('locklens').get<T>(key, fallback);
   }
-}
-
-function rangesMatch(declared: string, resolved: string): boolean {
-  const trimmed = declared.replace(/^[\^~>=<\s]+/, '').trim();
-  return trimmed === resolved;
 }

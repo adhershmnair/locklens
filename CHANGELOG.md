@@ -18,9 +18,14 @@ All notable changes to **LockLens** are documented in this file.
 ### Settings
 
 - `locklens.checkUpdates` — enable or disable registry lookups (default: `true`).
-- `locklens.outdatedColor` — color for outdated annotations (default: `#d64545`).
-- `locklens.upToDateColor` — color for up-to-date annotations (default: `#64a46b`).
-- `locklens.decorationColor` — color for unknown/fetching annotations (default: `#7c7c7c`).
+- `locklens.colorize` — toggle red/green coloring; when off, a single neutral color is used (default: `true`).
+- `locklens.outdatedColor` — color when a newer version is available on the registry (default: `#d64545`).
+- `locklens.upToDateColor` — color otherwise (default: `#64a46b`).
+
+### Removed
+
+- `locklens.showOnlyIfDiffers` setting (always show the resolved version now).
+- `locklens.decorationColor` setting (simplified to two states).
 
 ## [0.1.0] — 2026-04-22
 

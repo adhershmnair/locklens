@@ -53,15 +53,15 @@
           "default": true,
           "description": "Show inline resolved versions."
         },
-        "locklens.showOnlyIfDiffers": {
-          "type": "boolean",
-          "default": false,
-          "description": "Only show resolved version when it differs from the declared constraint."
-        },
         "locklens.checkUpdates": {
           "type": "boolean",
           "default": true,
-          "description": "Check the registry (npmjs / Packagist) for newer versions and color-code accordingly."
+          "description": "Check the registry (npmjs / Packagist) for newer versions."
+        },
+        "locklens.colorize": {
+          "type": "boolean",
+          "default": true,
+          "description": "Color the inline version (red when outdated, green otherwise). Turn off for a single neutral color."
         },
         "locklens.outdatedColor": {
           "type": "string",
@@ -71,7 +71,7 @@
         "locklens.upToDateColor": {
           "type": "string",
           "default": "#64a46b",
-          "description": "Color used when the resolved version matches the latest on the registry."
+          "description": "Color used otherwise."
         }
       }
     }
