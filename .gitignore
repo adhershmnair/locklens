@@ -36,6 +36,3 @@ Thumbs.db
 # Coverage
 coverage/
 .nyc_output/
-
-# Local planning docs
-PLAN.md
