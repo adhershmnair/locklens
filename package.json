@@ -1,0 +1,83 @@
+{
+  "name": "locklens",
+  "displayName": "LockLens",
+  "description": "Inline resolved versions from lock files across npm, yarn, pnpm, bun, and composer.",
+  "version": "0.1.0",
+  "publisher": "adhershmnair",
+  "icon": "media/logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adhershmnair/locklens"
+  },
+  "bugs": {
+    "url": "https://github.com/adhershmnair/locklens/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "npm",
+    "yarn",
+    "pnpm",
+    "bun",
+    "composer",
+    "lockfile",
+    "versions",
+    "dependencies"
+  ],
+  "activationEvents": [
+    "onLanguage:json",
+    "onLanguage:jsonc"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "locklens.refresh",
+        "title": "LockLens: Refresh resolved versions"
+      },
+      {
+        "command": "locklens.toggle",
+        "title": "LockLens: Toggle inline versions"
+      }
+    ],
+    "configuration": {
+      "title": "LockLens",
+      "properties": {
+        "locklens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline resolved versions."
+        },
+        "locklens.showOnlyIfDiffers": {
+          "type": "boolean",
+          "default": false,
+          "description": "Only show resolved version when it differs from the declared constraint."
+        },
+        "locklens.decorationColor": {
+          "type": "string",
+          "default": "#7c7c7c",
+          "description": "Color used for the inline resolved version."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  }
+}

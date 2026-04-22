@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1f2d3d"/>
+      <stop offset="1" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7ee8fa"/>
+      <stop offset="1" stop-color="#80ff72"/>
+    </linearGradient>
+    <linearGradient id="shackle" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7ee8fa"/>
+      <stop offset="1" stop-color="#3ba9c9"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="256" height="256" rx="48" fill="url(#bg)"/>
+
+  <g transform="translate(128 112)">
+    <circle cx="0" cy="8" r="78" fill="none" stroke="url(#ring)" stroke-width="6" opacity="0.3"/>
+    <circle cx="0" cy="8" r="60" fill="none" stroke="url(#ring)" stroke-width="2" opacity="0.5"/>
+
+    <path d="M -30 -10 A 30 30 0 0 1 30 -10 L 30 6 L 18 6 L 18 -10 A 18 18 0 0 0 -18 -10 L -18 6 L -30 6 Z"
+          fill="url(#shackle)"/>
+
+    <rect x="-42" y="4" width="84" height="62" rx="10" fill="#0b1220" stroke="url(#ring)" stroke-width="3"/>
+
+    <circle cx="0" cy="28" r="9" fill="url(#ring)"/>
+    <rect x="-3" y="32" width="6" height="20" rx="2" fill="url(#ring)"/>
+  </g>
+
+  <g font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif"
+     font-weight="700" text-anchor="middle" fill="#e7f3ff">
+    <text x="128" y="232" font-size="22" letter-spacing="3">LOCKLENS</text>
+  </g>
+</svg>

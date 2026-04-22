@@ -1,0 +1,10 @@
+{
+    "name": "sample/composer",
+    "require": {
+        "monolog/monolog": "^2.0",
+        "psr/log": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    }
+}

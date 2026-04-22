@@ -1,0 +1,13 @@
+.vscode/**
+.vscode-test/**
+src/**
+sample-node/**
+sample-composer/**
+.gitignore
+.yarnrc
+tsconfig.json
+**/*.map
+**/*.ts
+node_modules/@types/**
+node_modules/typescript/**
+node_modules/@vscode/vsce/**

@@ -1,0 +1,12 @@
+{
+  "name": "sample-node",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^18.2.0",
+    "lodash": "^4.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
