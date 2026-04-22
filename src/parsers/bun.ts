@@ -1,4 +1,4 @@
-import { ResolvedMap } from './types';
+import { ResolvedMap, addVersion } from './types';
 
 interface BunLockFile {
   lockfileVersion?: number;
@@ -13,7 +13,7 @@ export function parseBunLock(raw: string): ResolvedMap {
 
   for (const [name, entry] of Object.entries(data.packages)) {
     const version = extractVersion(entry);
-    if (version && !out.has(name)) out.set(name, version);
+    if (version) addVersion(out, name, { version });
   }
   return out;
 }

@@ -1,4 +1,4 @@
-import { ResolvedMap } from './types';
+import { ResolvedMap, addVersion } from './types';
 
 interface ComposerLockEntry {
   name?: string;
@@ -19,7 +19,7 @@ export function parseComposerLock(raw: string): ResolvedMap {
     for (const entry of list) {
       if (!entry?.name || !entry?.version) continue;
       const version = entry.version.startsWith('v') ? entry.version.slice(1) : entry.version;
-      if (!out.has(entry.name)) out.set(entry.name, version);
+      addVersion(out, entry.name, { version });
     }
   }
   return out;

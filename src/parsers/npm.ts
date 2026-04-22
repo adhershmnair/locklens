@@ -1,4 +1,4 @@
-import { ResolvedMap } from './types';
+import { ResolvedMap, addVersion } from './types';
 
 interface NpmLockPackage {
   version?: string;
@@ -22,27 +22,31 @@ export function parseNpmLock(raw: string): ResolvedMap {
   if (data.packages) {
     for (const [key, pkg] of Object.entries(data.packages)) {
       if (!key || !pkg?.version) continue;
-      const name = extractNameFromPath(key);
-      if (name && !out.has(name)) out.set(name, pkg.version);
+      const parsed = parsePackagePath(key);
+      if (!parsed) continue;
+      addVersion(out, parsed.name, { version: pkg.version, parent: parsed.parent });
     }
   }
 
   if (data.dependencies) {
-    walkV1(data.dependencies, out);
+    walkV1(data.dependencies, undefined, out);
   }
 
   return out;
 }
 
-function extractNameFromPath(key: string): string | null {
-  const idx = key.lastIndexOf('node_modules/');
-  if (idx === -1) return null;
-  return key.slice(idx + 'node_modules/'.length);
+function parsePackagePath(key: string): { name: string; parent?: string } | null {
+  const segments = key.split('node_modules/').filter(Boolean);
+  if (segments.length === 0) return null;
+  const name = segments[segments.length - 1].replace(/\/$/, '');
+  if (!name) return null;
+  const parent = segments.length > 1 ? segments[segments.length - 2].replace(/\/$/, '') : undefined;
+  return { name, parent };
 }
 
-function walkV1(deps: Record<string, NpmLockV1Dep>, out: ResolvedMap): void {
+function walkV1(deps: Record<string, NpmLockV1Dep>, parent: string | undefined, out: ResolvedMap): void {
   for (const [name, dep] of Object.entries(deps)) {
-    if (dep?.version && !out.has(name)) out.set(name, dep.version);
-    if (dep?.dependencies) walkV1(dep.dependencies, out);
+    if (dep?.version) addVersion(out, name, { version: dep.version, parent });
+    if (dep?.dependencies) walkV1(dep.dependencies, name, out);
   }
 }

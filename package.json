@@ -2,7 +2,7 @@
   "name": "locklens",
   "displayName": "LockLens",
   "description": "Inline resolved versions from lock files across npm, yarn, pnpm, bun, and composer.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "adhershmnair",
   "icon": "media/logo.png",
   "repository": {
@@ -58,10 +58,20 @@
           "default": false,
           "description": "Only show resolved version when it differs from the declared constraint."
         },
-        "locklens.decorationColor": {
+        "locklens.checkUpdates": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check the registry (npmjs / Packagist) for newer versions and color-code accordingly."
+        },
+        "locklens.outdatedColor": {
           "type": "string",
-          "default": "#7c7c7c",
-          "description": "Color used for the inline resolved version."
+          "default": "#d64545",
+          "description": "Color used when a newer version is available on the registry."
+        },
+        "locklens.upToDateColor": {
+          "type": "string",
+          "default": "#64a46b",
+          "description": "Color used when the resolved version matches the latest on the registry."
         }
       }
     }

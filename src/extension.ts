@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { LockLensDecorator } from './decorator';
+import { clearRegistryCache } from './registry';
 
 const LOCK_FILES = new Set([
   'package-lock.json',
@@ -32,7 +33,10 @@ export function activate(context: vscode.ExtensionContext): void {
         refreshAll();
       }
     }),
-    vscode.commands.registerCommand('locklens.refresh', refreshAll),
+    vscode.commands.registerCommand('locklens.refresh', () => {
+      clearRegistryCache();
+      refreshAll();
+    }),
     vscode.commands.registerCommand('locklens.toggle', () => decorator.toggle())
   );
 
